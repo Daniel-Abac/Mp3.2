@@ -5,19 +5,115 @@
  */
 package aplicaciónmp3;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
- * @author Daniel
+ * @author alehe
  */
 public class EditarDatos extends javax.swing.JFrame {
 
     /**
-     * Creates new form EditarDatos
+     * Creates new form jp
      */
-    public EditarDatos() {
+    private ArrayList<IndiceNombre> indiceRegistros;
+    private String puntero;
+    private ArrayList<MP3> listaEditar;
+    private GuardaRegistros info = new GuardaRegistros();
+    private int posicionAModificar = 0;
+    private int op1, op2, op3, op4, op5, op6= 0;//Significa que todos la primera vez no estan para editar
+    
+    public EditarDatos(String cancion) {
         initComponents();
+        this.setLocationRelativeTo(null);
+        this.listaEditar = new ArrayList<MP3>();
+        puntero = cancion;
     }
 
+    public ArrayList<MP3> getListaEditar() {
+        return listaEditar;
+    }
+    
+    public void getData() throws FileNotFoundException, IOException {       
+        RandomAccessFile lectura = new RandomAccessFile("canciones.data", "rw");
+        short punteroIndice = lectura.readShort();
+        lectura.seek(punteroIndice);
+        for (int i = 0; i < lectura.length(); i++) {//Recorre el archivo para obtener los indices
+            short posicionDatos = lectura.readShort();
+            
+            byte longitud = lectura.readByte();
+            byte[] caracteres = new byte[longitud * 2];
+            lectura.read(caracteres);
+            String cancion = new String(caracteres);
+            System.out.println("cancion " + cancion);
+            punteroIndice = (short)lectura.getFilePointer();
+            
+            lectura.seek(posicionDatos);                        
+            byte longitud2 = lectura.readByte();
+            byte[] caracteres2 = new byte[longitud2 * 2];
+            lectura.read(caracteres2);
+            String artista = new String(caracteres2);  
+            System.out.println("artista " + artista);
+            byte longitud3 = lectura.readByte();
+            byte[] caracteres3 = new byte[longitud3 * 2];
+            lectura.read(caracteres3);
+            String album = new String(caracteres3);  
+            
+            byte longitud4 = lectura.readByte();
+            byte[] caracteres4 = new byte[longitud4 * 2];
+            lectura.read(caracteres4);
+            String fecha = new String(caracteres4); 
+            
+            byte longitud5 = lectura.readByte();
+            byte[] caracteres5 = new byte[longitud5 * 2];
+            lectura.read(caracteres5);
+            String genero = new String(caracteres5); 
+            
+            byte longitud6 = lectura.readByte();
+            byte[] caracteres6 = new byte[longitud6 * 2];
+            lectura.read(caracteres6);
+            String duracion = new String(caracteres6); 
+            
+            byte longitud7 = lectura.readByte();
+            byte[] caracteres7 = new byte[longitud7 * 2];
+            lectura.read(caracteres7);
+            String URL = new String(caracteres7); 
+            System.out.println("URl " + URL);
+            byte longitud8 = lectura.readByte();
+            System.out.println(longitud8);
+            byte[] caracteres8 = new byte[longitud8 * 2];
+            
+            //Como leer un byte sin signo
+            System.out.println("eS " + longitud8*2);
+            lectura.read(caracteres8);
+            String direccionCancion = new String(caracteres8);
+            
+            byte longitud9 = lectura.readByte();
+            byte[] caracteres9 = new byte[longitud9 * 2];
+            lectura.read(caracteres9);
+            String direccionLetra = new String(caracteres9);
+            listaEditar.add(new MP3(artista, album, fecha, genero, duracion, URL, direccionCancion, direccionLetra));
+            lectura.seek(punteroIndice);
+            
+            if (lectura.getFilePointer() == lectura.length() || cancion.equals(puntero) == true){
+                posicionAModificar = i;                 //Detiene el puntero si encuentra la canción                                                  
+                break;
+            }
+        }
+        lectura.close();
+        //listaEditar.get(0).getNombre_artista();
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,89 +123,105 @@ public class EditarDatos extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        nombreCancion = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        nombreCancion = new javax.swing.JTextField();
         nombreArtista = new javax.swing.JTextField();
         sFecha = new javax.swing.JTextField();
         sGenero = new javax.swing.JTextField();
         sURL = new javax.swing.JTextField();
+        Guardar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jLabel7 = new javax.swing.JLabel();
         Letra = new javax.swing.JTextField();
         jComboBox1 = new javax.swing.JComboBox<>();
-        Guardar = new javax.swing.JButton();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        Fondo = new javax.swing.JLabel();
+        fondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        jButton1.setBackground(new java.awt.Color(255, 153, 0));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/iconosalir.png"))); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 90, 60, 60));
+
+        jLabel1.setBackground(new java.awt.Color(51, 102, 255));
+        jLabel1.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Cancion :");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 160, -1));
-
-        jLabel2.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Artista :");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 150, -1));
-
-        jLabel3.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Fecha de Lanzamiento :");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, -1));
-
-        jLabel4.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Genero :");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 200, 160, -1));
-
-        jLabel5.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("URL :");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 240, 160, -1));
-
-        jLabel6.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("Letra :");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 270, 160, -1));
-
-        jLabel7.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("Direccion :");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 380, 160, -1));
+        jLabel1.setText("Letra");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, -1, -1));
 
         nombreCancion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nombreCancionActionPerformed(evt);
             }
         });
-        getContentPane().add(nombreCancion, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 80, 350, -1));
-        getContentPane().add(nombreArtista, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 120, 350, -1));
-        getContentPane().add(sFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 350, 30));
-        getContentPane().add(sGenero, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 200, 350, -1));
-        getContentPane().add(sURL, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 240, 350, -1));
+        getContentPane().add(nombreCancion, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 20, 350, -1));
+
+        jLabel3.setBackground(new java.awt.Color(51, 102, 255));
+        jLabel3.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("Canción");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, -1, -1));
+
+        jLabel2.setBackground(new java.awt.Color(51, 102, 255));
+        jLabel2.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Artista");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 60, -1, -1));
+
+        jLabel4.setBackground(new java.awt.Color(51, 102, 255));
+        jLabel4.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("Fecha");
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, -1, -1));
+
+        jLabel5.setBackground(new java.awt.Color(51, 102, 255));
+        jLabel5.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel5.setText("Genero");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, -1, -1));
+
+        jLabel6.setBackground(new java.awt.Color(51, 102, 255));
+        jLabel6.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("URL");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, -1, -1));
+        getContentPane().add(nombreArtista, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 60, 350, -1));
+        getContentPane().add(sFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 100, 350, 30));
+        getContentPane().add(sGenero, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 140, 350, -1));
+        getContentPane().add(sURL, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 180, 350, -1));
+
+        Guardar.setText("Guardar Cambios");
+        Guardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GuardarActionPerformed(evt);
+            }
+        });
+        getContentPane().add(Guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 300, -1, -1));
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
         jScrollPane1.setViewportView(jTextArea1);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 270, 350, -1));
-        getContentPane().add(Letra, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 380, 350, -1));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 210, 350, -1));
+
+        jLabel7.setFont(new java.awt.Font("Berlin Sans FB Demi", 1, 14)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel7.setText("Dirección letra");
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 320, -1, -1));
+        getContentPane().add(Letra, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 320, 350, -1));
 
         jComboBox1.setBackground(new java.awt.Color(255, 204, 0));
         jComboBox1.setFont(new java.awt.Font("Tahoma", 0, 13)); // NOI18N
@@ -119,35 +231,32 @@ public class EditarDatos extends javax.swing.JFrame {
                 jComboBox1ActionPerformed(evt);
             }
         });
-        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 20, 150, -1));
+        getContentPane().add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 20, 150, -1));
 
-        Guardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagen/folder.png"))); // NOI18N
-        Guardar.setBorderPainted(false);
-        Guardar.setContentAreaFilled(false);
-        getContentPane().add(Guardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 360, -1, -1));
-
-        jLabel8.setFont(new java.awt.Font("Times New Roman", 1, 24)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("Editar Datos");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 20, -1, -1));
-
-        jLabel9.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setText("Guardar Cambios");
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 340, -1, -1));
-
-        Fondo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        Fondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagen/Fondo1.jpg"))); // NOI18N
-        getContentPane().add(Fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 710, 440));
+        fondo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        fondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/ab626f8b84973cc04d1bbcbac5c10478.jpg"))); // NOI18N
+        getContentPane().add(fondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 660, 360));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void nombreCancionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombreCancionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nombreCancionActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void GuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GuardarActionPerformed
+        
+        try {
+            this.recrearDatos();
+            info.guardar();
+
+            JOptionPane.showMessageDialog(null, "No edita ya que al recuperar los datos no puedo generar una string"
+                    + "\n En formato UTF-8 y eso complica la lecturaaaaaaaaaa", 
+                    "Información acerca de la canción", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(EditarDatos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_GuardarActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         System.out.println(jComboBox1.getSelectedIndex());//Jala posicion que el usuario a seleccionado
@@ -172,45 +281,124 @@ public class EditarDatos extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
+    private void nombreCancionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombreCancionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nombreCancionActionPerformed
+
+    public void MostrarDatosEnFrame() throws IOException{
+        this.getData();
+        nombreCancion.setEnabled(false);
+        nombreArtista.setEnabled(false);
+        sFecha.setEnabled(false);
+        sGenero.setEnabled(false);
+        sURL.setEnabled(false);
+        jTextArea1.setEnabled(false);
+        Letra.setEnabled(false);
+        nombreCancion.setText(this.puntero);
+        nombreArtista.setText(listaEditar.get(listaEditar.size() - 1).getNombre_artista());
+        sFecha.setText(listaEditar.get(listaEditar.size() - 1).getFecha_album());
+        sGenero.setText(listaEditar.get(listaEditar.size() - 1).getGenero());
+        sURL.setText(listaEditar.get(listaEditar.size() - 1).getURL());
+        if(listaEditar.get(listaEditar.size() - 1).getDireccion_letra().equals("NI")){//Es porque hay direccion de letra
+            System.out.println("=");
+            FileReader reader = new FileReader(listaEditar.get(listaEditar.size() - 1).getDireccion_letra());
+            jTextArea1.read(reader, listaEditar.get(listaEditar.size() - 1).getDireccion_letra());
+        }else{
+        }
+        Letra.setText(listaEditar.get(listaEditar.size() - 1).getDireccion_letra());
+    }
+    
+    public void recrearDatos() throws FileNotFoundException, IOException{
+        RandomAccessFile lectura = new RandomAccessFile("canciones.data", "rw");
+        short punteroIndice = lectura.readShort();
+        lectura.seek(punteroIndice);
+        for (int i = 0; i < lectura.length(); i++) {//Recorre el archivo para obtener los indices
+            short posicionDatos = lectura.readShort();
+            
+            byte longitud = lectura.readByte();
+            byte[] caracteres = new byte[longitud *2];
+            lectura.read(caracteres);
+            String cancion = new String(caracteres);
+            cancion = new String(cancion.getBytes("UTF-16"), "UTF-8");
+            punteroIndice = (short)lectura.getFilePointer();
+            System.out.println("cancion en utf " + cancion + cancion.length());
+            lectura.seek(posicionDatos);                        
+            byte longitud2 = lectura.readByte();
+            byte[] caracteres2 = new byte[longitud2 * 2];
+            lectura.read(caracteres2);
+            String artista = new String(caracteres2);  
+            
+            byte longitud3 = lectura.readByte();
+            byte[] caracteres3 = new byte[longitud3 * 2];
+            lectura.read(caracteres3);
+            String album = new String(caracteres3);  
+            
+            byte longitud4 = lectura.readByte();
+            byte[] caracteres4 = new byte[longitud4 * 2];
+            lectura.read(caracteres4);
+            String fecha = new String(caracteres4); 
+            
+            byte longitud5 = lectura.readByte();
+            byte[] caracteres5 = new byte[longitud5 * 2];
+            lectura.read(caracteres5);
+            String genero = new String(caracteres5); 
+            
+            byte longitud6 = lectura.readByte();
+            byte[] caracteres6 = new byte[longitud6 * 2];
+            lectura.read(caracteres6);
+            String duracion = new String(caracteres6); 
+            
+            byte longitud7 = lectura.readByte();
+            byte[] caracteres7 = new byte[longitud7 * 2];
+            lectura.read(caracteres7);
+            String URL = new String(caracteres7); 
+            
+            byte longitud8 = lectura.readByte();
+            byte[] caracteres8 = new byte[longitud8 * 2];
+            lectura.read(caracteres8);
+            String direccionCancion = new String(caracteres8);
+            byte longitud9 = lectura.readByte();
+            byte[] caracteres9 = new byte[longitud9 * 2];
+            lectura.read(caracteres9);
+            String direccionLetra = new String(caracteres9);
+            if(i == posicionAModificar){
+                if(op1 == 1){//Esto para saber a quienes modificar
+                    cancion = nombreCancion.getText();
+                }else if(op2 == 1){
+                    artista = nombreArtista.getText();
+                }else if(op3 == 1){
+                    fecha = sFecha.getText();
+                }else if(op4 == 1){
+                    genero = sGenero.getText();
+                }else if(op5 == 1){
+                    URL = sURL.getText();
+                }else if(op6 == 1){
+                    direccionLetra = Letra.getText();
+                }
+                System.out.println("Direccion letra " + direccionLetra+ direccionLetra);
+                info.agregarCancion(new MP3(artista, album, fecha, genero, duracion,
+                    URL, direccionCancion, direccionLetra), cancion);
+            }else{
+                info.agregarCancion(new MP3(artista, album, fecha, genero, duracion,
+                    URL, direccionCancion, direccionLetra), cancion);
+            }
+            lectura.seek(punteroIndice);
+            if (lectura.getFilePointer() == lectura.length()){                                                 
+                break;
+            }
+        }
+        lectura.close();
+    }
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(EditarDatos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(EditarDatos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(EditarDatos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(EditarDatos.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new EditarDatos().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel Fondo;
     private javax.swing.JButton Guardar;
     private javax.swing.JTextField Letra;
+    private javax.swing.JLabel fondo;
+    private javax.swing.JButton jButton1;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -219,8 +407,6 @@ public class EditarDatos extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField nombreArtista;
@@ -230,4 +416,3 @@ public class EditarDatos extends javax.swing.JFrame {
     private javax.swing.JTextField sURL;
     // End of variables declaration//GEN-END:variables
 }
-

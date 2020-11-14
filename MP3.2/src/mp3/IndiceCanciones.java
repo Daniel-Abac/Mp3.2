@@ -34,10 +34,10 @@ public class IndiceCanciones {
         this.posicion = posicion;
     }
     
-    @Override
     public int compareTo(IndiceCanciones o) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
+
 
 
