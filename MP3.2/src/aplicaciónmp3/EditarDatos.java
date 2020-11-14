@@ -91,18 +91,18 @@ public class EditarDatos extends javax.swing.JFrame {
             System.out.println("URl " + URL);
             byte longitud8 = lectura.readByte();
             System.out.println(longitud8);
-            byte[] caracteres8 = new byte[longitud8 * 2];
             
+            /*byte[] caracteres8 = new byte[longitud8 * 2];
             //Como leer un byte sin signo
             System.out.println("eS " + longitud8*2);
             lectura.read(caracteres8);
-            String direccionCancion = new String(caracteres8);
+            String direccionCancion = new String(caracteres8);*/
             
             byte longitud9 = lectura.readByte();
             byte[] caracteres9 = new byte[longitud9 * 2];
             lectura.read(caracteres9);
             String direccionLetra = new String(caracteres9);
-            listaEditar.add(new MP3(artista, album, fecha, genero, duracion, URL, direccionCancion, direccionLetra));
+            listaEditar.add(new MP3(artista, album, fecha, genero, duracion, URL/* direccionCancion*/, direccionLetra));
             lectura.seek(punteroIndice);
             
             if (lectura.getFilePointer() == lectura.length() || cancion.equals(puntero) == true){
@@ -377,10 +377,10 @@ public class EditarDatos extends javax.swing.JFrame {
                 }
                 System.out.println("Direccion letra " + direccionLetra+ direccionLetra);
                 info.agregarCancion(new MP3(artista, album, fecha, genero, duracion,
-                    URL, direccionCancion, direccionLetra), cancion);
+                    URL/* direccionCancion*/, direccionLetra), cancion);
             }else{
                 info.agregarCancion(new MP3(artista, album, fecha, genero, duracion,
-                    URL, direccionCancion, direccionLetra), cancion);
+                    URL/* direccionCancion*/, direccionLetra), cancion);
             }
             lectura.seek(punteroIndice);
             if (lectura.getFilePointer() == lectura.length()){                                                 
